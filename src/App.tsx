@@ -34,8 +34,7 @@ import {
   IdCard,
   X,
   Loader2,
-  Pause,
-  Play,
+  Mic,
 } from 'lucide-react';
 
 // Custom SMS Icon with 3 dots inside speech bubble
@@ -104,7 +103,7 @@ export default function App() {
   const [selectedRequirement, setSelectedRequirement] = useState<CandidateRequirement | null>(null);
   const [reportStep, setReportStep] = useState<'select-requirement' | 'loading-report'>('select-requirement');
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [roleStatus, setRoleStatus] = useState<'idle' | 'active' | 'paused'>('idle');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'brewvoice'>('dashboard');
 
   const allCandidateNames = ['Raj', 'Test Yogesh', 'Shuvam Jena', 'Naresh Gali', 'Aditya Roy Test'];
 
@@ -255,8 +254,31 @@ export default function App() {
 
         {/* Scrollable Main Content Viewport */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col bg-[#f8fafc]">
-          {/* Header Summary Section */}
-          <div className="bg-white border-b border-slate-200 px-6 pt-4 pb-0 shrink-0 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+          {currentView === 'brewvoice' ? (
+            <div className="flex-1 p-6 flex flex-col items-center justify-center bg-[#f8fafc]">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-12 max-w-md w-full flex flex-col items-center justify-center gap-6 text-center animate-in fade-in zoom-in-95 duration-150">
+                <div className="w-16 h-16 rounded-full bg-sky-50 border border-sky-100 flex items-center justify-center text-[#006f8c] shadow-xs">
+                  <Mic className="w-8 h-8" />
+                </div>
+                <div className="space-y-1">
+                  <h1 className="text-3xl font-bold text-slate-900 tracking-tight">BrewVoice</h1>
+                  <p className="text-xs text-slate-500">
+                    Voice-Assisted Role Configuration
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCurrentView('dashboard')}
+                  className="bg-[#006f8c] hover:bg-[#005f77] text-white text-xs font-semibold px-8 py-2.5 rounded-lg shadow-sm transition-colors cursor-pointer mt-2"
+                >
+                  Finish
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Header Summary Section */}
+              <div className="bg-white border-b border-slate-200 px-6 pt-4 pb-0 shrink-0 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
             {/* Breadcrumb */}
             <div className="flex items-center gap-1.5 text-xs mb-2">
               <Home className="w-3.5 h-3.5 text-slate-400 stroke-[1.8]" />
@@ -307,49 +329,13 @@ export default function App() {
               <div className="flex flex-col items-end gap-3">
                 {/* Actions Row */}
                 <div className="flex items-center gap-2">
-                  {roleStatus === 'idle' ? (
-                    <button
-                      type="button"
-                      onClick={() => setRoleStatus('active')}
-                      className="flex items-center gap-1.5 bg-[#006f8c] hover:bg-[#005f77] text-white text-xs font-semibold px-4 py-1.5 rounded shadow-sm cursor-pointer"
-                    >
-                      <span>Create Role</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setRoleStatus(roleStatus === 'active' ? 'paused' : 'active')}
-                      className={`flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded shadow-sm cursor-pointer transition-colors ${
-                        roleStatus === 'active'
-                          ? 'bg-[#ecfdf5] text-[#10b981] border border-[#a7f3d0] hover:bg-[#d1fae5]'
-                          : 'bg-[#fff7ed] text-[#ea580c] border border-[#fed7aa] hover:bg-[#ffedd5]'
-                      }`}
-                    >
-                      {roleStatus === 'active' ? (
-                        <>
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></div>
-                          <span>Active</span>
-                          <Pause className="w-3.5 h-3.5" />
-                        </>
-                      ) : (
-                        <>
-                          <span>Paused</span>
-                          <Play className="w-3.5 h-3.5" />
-                        </>
-                      )}
-                    </button>
-                  )}
-
                   <button
                     type="button"
-                    disabled={selectedCandidates.length === 0}
-                    className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded shadow-sm transition-colors ${
-                      selectedCandidates.length > 0
-                        ? 'bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 cursor-pointer'
-                        : 'bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed'
-                    }`}
+                    onClick={() => setCurrentView('brewvoice')}
+                    className="flex flex-col items-center justify-center bg-[#e6f3ff] hover:bg-[#d6ecff] border border-[#3b96f3] text-slate-900 text-[11px] font-semibold px-3.5 py-1 rounded-md shadow-xs cursor-pointer transition-colors leading-tight text-center"
                   >
-                    <span>Auto Sourcing</span>
+                    <span>Setup</span>
+                    <span>(BrewVoice)</span>
                   </button>
 
                   <button
@@ -493,6 +479,19 @@ export default function App() {
                   >
                     <span>Status</span>
                     <ChevronDown className="w-3 h-3 text-slate-500" />
+                  </button>
+
+                  {/* Send Candidate (Auto Sourcing) Button */}
+                  <button
+                    type="button"
+                    disabled={selectedCandidates.length === 0}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium shadow-sm transition-colors ${
+                      selectedCandidates.length > 0
+                        ? 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer'
+                        : 'bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
+                  >
+                    <span>Send Candidate (Auto Sourcing)</span>
                   </button>
                 </div>
 
@@ -1171,6 +1170,19 @@ export default function App() {
                         <ChevronDown className="w-3 h-3 text-slate-500" />
                       </button>
 
+                      {/* Send Candidate (Auto Sourcing) Button */}
+                      <button
+                        type="button"
+                        disabled={selectedCandidates.length === 0}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium shadow-sm transition-colors ${
+                          selectedCandidates.length > 0
+                            ? 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer'
+                            : 'bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <span>Send Candidate (Auto Sourcing)</span>
+                      </button>
+
                       <label className="flex items-center gap-2 cursor-pointer text-slate-700 font-medium">
                         <input
                           type="checkbox"
@@ -1476,7 +1488,9 @@ export default function App() {
               </div>
             )}
           </div>
-        </main>
+        </>
+      )}
+    </main>
       </div>
 
       {/* Requirement Selection / SkillBrew Report Modal */}
